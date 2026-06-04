@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daniel Herrera — Software Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0c;
+      --bg-card: #111116;
+      --bg-card-hover: #16161c;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(255,255,255,0.15);
+      --text-primary: #f0eff4;
+      --text-secondary: #888899;
+      --text-muted: #44445a;
+      --accent: #c8b8ff;
+      --accent-dim: rgba(200,184,255,0.12);
+      --accent-glow: rgba(200,184,255,0.08);
+      --green: #6effc3;
+      --green-dim: rgba(110,255,195,0.1);
+      --amber: #ffc97a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Subtle grid texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Ambient glow */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(200,184,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.25rem 0;
+      background: rgba(10,10,12,0.7);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text-primary); }
+
+    /* HERO */
+    .hero {
+      padding: 160px 0 100px;
+    }
+
+    .hero-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.1s forwards;
+    }
+
+    .hero-name {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.25s forwards;
+    }
+
+    .hero-name span {
+      color: var(--accent);
+    }
+
+    .hero-title {
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.4s forwards;
+    }
+
+    .hero-bio {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.55s forwards;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.7s forwards;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: 6px;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #1a1030;
+    }
+
+    .btn-primary:hover {
+      background: #ddd0ff;
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-hover);
+    }
+
+    .btn-ghost:hover {
+      color: var(--text-primary);
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* STATUS BADGE */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--green);
+      background: var(--green-dim);
+      border: 1px solid rgba(110,255,195,0.2);
+      border-radius: 100px;
+      padding: 0.35rem 0.9rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.0s forwards;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    /* SECTION */
+    section { padding: 80px 0; }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 3rem;
+    }
+
+    /* PROJECTS */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .project-card {
+      background: var(--bg-card);
+      padding: 2rem;
+      transition: background 0.2s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent-glow);
+      opacity: 0;
+      transition: opacity 0.3s;
+	  pointer-events: none;
+    }
+
+    .project-card:hover { background: var(--bg-card-hover); }
+    .project-card:hover::before { opacity: 1; }
+
+    .project-number {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .project-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.01em;
+    }
+
+    .project-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .project-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: gap 0.2s;
+    }
+
+    .project-link:hover { gap: 0.6rem; }
+
+    /* SKILLS */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .skill-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+
+    .skill-group-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .skill-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .skill-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .skill-dot {
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* EXPERIENCE */
+    .exp-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-left: 1px solid var(--border);
+      padding-left: 2rem;
+      margin-left: 1rem;
+    }
+
+    .exp-item {
+      position: relative;
+      padding-bottom: 2.5rem;
+    }
+
+    .exp-item::before {
+      content: '';
+      position: absolute;
+      left: calc(-2rem - 4px);
+      top: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--bg);
+    }
+
+    .exp-period {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.35rem;
+    }
+
+    .exp-role {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.2rem;
+    }
+
+    .exp-company {
+      font-size: 0.85rem;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+
+    .exp-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    /* CONTACT */
+    .contact-box {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3rem;
+      text-align: center;
+      background: var(--bg-card);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-box::before {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      height: 200px;
+      background: radial-gradient(ellipse, var(--accent-dim) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .contact-box h3 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+    }
+
+    .contact-box p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .social-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: color 0.2s;
+    }
+
+    .social-link:hover { color: var(--accent); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hero { padding: 120px 0 80px; }
+      .contact-box { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="inner">
+      <a href="#" class="nav-logo">&#123; Daniel Herrera &#125;</a>
+      <ul class="nav-links">
+        <li><a href="#projects">Work</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        Available for new opportunities
+      </div>
+      <div class="hero-label">Software Engineer</div>
+      <h1 class="hero-name">Daniel<br /><span>Herrera</span></h1>
+      <p class="hero-title">Building products people enjoy using.</p>
+      <p class="hero-bio">
+        I craft fast, reliable, and thoughtful software. From backend APIs to
+        polished user interfaces. Focused on clean architecture and the details that matter.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View my work →</a>
+        <a href="#contact" class="btn btn-ghost">Get in touch</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">// selected projects</p>
+        <h2 class="section-title">What I've built.</h2>
+      </div>
+      <div class="projects-grid reveal">
+
+        <!-- Project 1 -->
+        <div class="project-card">
+          <p class="project-number">01 —</p>
+          <h3 class="project-name">Fitquest</h3>
+          <p class="project-desc">
+            Web application that makes working out a fun rpg where you 
+			log your workouts and level-up.
+          </p>
+          <div class="project-tags">
+            <span class="tag">JavaScript</span>
+            <span class="tag">CSS Tailwind</span>
+            <span class="tag">NOSQL</span>
+            <span class="tag">HTML</span>
+          </div>
+          <a href="https://danielherrera144.github.io/COMP-490-Team-Run/" class="project-link">View project →</a>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="project-card">
+          <p class="project-number">02 —</p>
+          <h3 class="project-name">Game Look-up</h3>
+          <p class="project-desc">
+            Using RAWG API to gain access to library of games
+			that users can look-up and find what they want.
+          </p>
+          <div class="project-tags">
+            <span class="tag">JavaScript</span>
+            <span class="tag">CSS</span>
+            <span class="tag">HTML</span>
+          </div>
+          <a href="https://danielherrera144.github.io/Project-5-API/" class="project-link">View project →</a>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="project-card">
+          <p class="project-number">03 —</p>
+          <h3 class="project-name">Algorithm Visualizer</h3>
+          <p class="project-desc">
+            Web application that helps students understand the time complexity of
+			different algorithms via visual sorting.
+          </p>
+          <div class="project-tags">
+            <span class="tag">JavaScript</span>
+            <span class="tag">CSS</span>
+            <span class="tag">HTML</span>
+          </div>
+          <a href="https://algorithm-visualizer-ecru-kappa.vercel.app/" class="project-link">View project →</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">// technical skills</p>
+        <h2 class="section-title">What I work with.</h2>
+      </div>
+      <div class="skills-grid reveal">
+
+        <div class="skill-group">
+          <p class="skill-group-title">Languages</p>
+          <div class="skill-list">
+            <div class="skill-item"><span class="skill-dot"></span>TypeScript / JavaScript</div>
+            <div class="skill-item"><span class="skill-dot"></span>Python</div>
+            <div class="skill-item"><span class="skill-dot"></span>Java</div>
+            <div class="skill-item"><span class="skill-dot"></span>SQL</div>
+            <div class="skill-item"><span class="skill-dot"></span>Racket</div>
+            <div class="skill-item"><span class="skill-dot"></span>Prolog</div>
+
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <p class="skill-group-title">Frontend</p>
+          <div class="skill-list">
+            <div class="skill-item"><span class="skill-dot"></span>React / Next.js</div>
+            <div class="skill-item"><span class="skill-dot"></span>HTML & CSS</div>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <p class="skill-group-title">Backend & Infra</p>
+          <div class="skill-list">
+            <div class="skill-item"><span class="skill-dot"></span>Node.js / FastAPI</div>
+            <div class="skill-item"><span class="skill-dot"></span>PostgreSQL / Redis</div>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <p class="skill-group-title">Practices</p>
+          <div class="skill-list">
+            <div class="skill-item"><span class="skill-dot"></span>CI/CD</div>
+            <div class="skill-item"><span class="skill-dot"></span>System Design</div>
+            <div class="skill-item"><span class="skill-dot"></span>Code Review</div>
+            <div class="skill-item"><span class="skill-dot"></span>Technical Writing</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-box reveal">
+        <h3>Let's build something.</h3>
+        <p>
+          Open to senior / staff engineering roles, interesting contracts,<br />
+          and side projects worth the late nights.
+        </p>
+        <a href="mailto:you@email.com" class="btn btn-primary">Say hello →</a>
+        <div class="social-links">
+          <a href="https://github.com/danielHerrera144" class="social-link" target="_blank">
+            ↗ GitHub
+          </a>
+          <a href="https://www.linkedin.com/in/daniel-herrera-dh089/" class="social-link" target="_blank">
+            ↗ LinkedIn
+          </a>
+          <a href="Assets/Resume.pdf" class="social-link" target="_blank">
+            ↗ Resume (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>Designed & built by Your Name · 2025</p>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.1 }
+    );
+    reveals.forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
